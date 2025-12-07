@@ -3,15 +3,10 @@ package main
 import (
 	"net/http"
 
+	"pizzaria/models.go"
+
 	"github.com/gin-gonic/gin"
 )
-
-// Pizza represents a pizza item (model)
-type Pizza struct {
-	ID    int     `json:"id"`
-	Name  string  `json:"name"`
-	Price float64 `json:"price"`
-}
 
 func main() {
 
@@ -38,11 +33,12 @@ func main() {
 func getPizzas(c *gin.Context) {
 
 	// Example pizza list
-	var pizzas = []Pizza{
+	var pizzas = []models.Pizza{
 		{ID: 1, Name: "Toscana", Price: 25.00},
 		{ID: 2, Name: "Margherita", Price: 20.00},
 		{ID: 3, Name: "Pepperoni", Price: 30.00},
 	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"pizzas": pizzas,
 	})
