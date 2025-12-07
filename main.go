@@ -6,29 +6,44 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Pizza represents a pizza item (model)
 type Pizza struct {
-	ID    int
-	Name  string
-	Price float64
+	ID    int     `json:"id"`
+	Name  string  `json:"name"`
+	Price float64 `json:"price"`
 }
 
 func main() {
 
+	// Initialize Gin router
 	router := gin.Default()
 
-	router.GET("/pizzas", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Toscana, Calabresa, Margherita",
-		})
-	})
+	// Register route to fetch pizzas
+	router.GET("/pizzas", getPizzas)
 
-	router.Run() // listen and serve on :8080
+	// Start server on default port :8080
+	router.Run()
 
-	nomePizzaria := "Pizzaria GO"
+	// Basic pizzeria information (printed in terminal)
+	name := "Pizzaria GO"
 	instagram, phone := "pizzariago", "1234-5678"
 
-	println("Nome:", nomePizzaria)
-	println("Informações da Pizzaria:")
+	println("Name:", name)
+	println("Pizzeria Info:")
 	println("Instagram:", instagram)
-	println("Telefone:", phone)
+	println("Phone:", phone)
+}
+
+// getPizzas handles GET requests and returns a list of pizzas in JSON format
+func getPizzas(c *gin.Context) {
+
+	// Example pizza list
+	var pizzas = []Pizza{
+		{ID: 1, Name: "Toscana", Price: 25.00},
+		{ID: 2, Name: "Margherita", Price: 20.00},
+		{ID: 3, Name: "Pepperoni", Price: 30.00},
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"pizzas": pizzas,
+	})
 }
