@@ -1,20 +1,32 @@
 package main
 
-//principal function
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
 
 type Pizza struct {
 	ID    int
-	name  string
-	price float64
+	Name  string
+	Price float64
 }
 
 func main() {
 
-	//variable declaration style short	assignment
+	router := gin.Default()
+
+	router.GET("/pizzas", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Toscana, Calabresa, Margherita",
+		})
+	})
+
+	router.Run() // listen and serve on :8080
+
 	nomePizzaria := "Pizzaria GO"
 	instagram, phone := "pizzariago", "1234-5678"
 
-	//print values
 	println("Nome:", nomePizzaria)
 	println("Informações da Pizzaria:")
 	println("Instagram:", instagram)
