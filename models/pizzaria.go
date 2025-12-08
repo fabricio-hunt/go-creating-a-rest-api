@@ -1,6 +1,6 @@
 package models
 
-// Pizza represents a pizza item (model)
+// Pizza represents a pizza item in the system.
 type Pizza struct {
 	ID    int     `json:"id"`
 	Name  string  `json:"name"`

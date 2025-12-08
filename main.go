@@ -3,25 +3,34 @@ package main
 import (
 	"net/http"
 
-	"pizzaria/models.go"
+	"pizzaria/models"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+// pizzas stores an in-memory list of pizza items.
+// In real applications, this would be replaced by a database.
+var pizzas = []models.Pizza{
+	{ID: 1, Name: "Toscana", Price: 25.00},
+	{ID: 2, Name: "Margherita", Price: 20.00},
+	{ID: 3, Name: "Pepperoni", Price: 30.00},
+}
 
+func main() {
 	// Initialize Gin router
 	router := gin.Default()
 
-	// Register route to fetch pizzas
+	// Register routes
 	router.GET("/pizzas", getPizzas)
+	router.POST("/pizzas", postPizzas)
 
 	// Start server on default port :8080
 	router.Run()
 
-	// Basic pizzeria information (printed in terminal)
+	// Basic pizzeria information (printed to console)
 	name := "Pizzaria GO"
-	instagram, phone := "pizzariago", "1234-5678"
+	instagram := "pizzariago"
+	phone := "1234-5678"
 
 	println("Name:", name)
 	println("Pizzeria Info:")
@@ -29,17 +38,26 @@ func main() {
 	println("Phone:", phone)
 }
 
-// getPizzas handles GET requests and returns a list of pizzas in JSON format
+// getPizzas handles GET requests and returns a list of pizzas in JSON format.
 func getPizzas(c *gin.Context) {
-
-	// Example pizza list
-	var pizzas = []models.Pizza{
-		{ID: 1, Name: "Toscana", Price: 25.00},
-		{ID: 2, Name: "Margherita", Price: 20.00},
-		{ID: 3, Name: "Pepperoni", Price: 30.00},
-	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"pizzas": pizzas,
 	})
+}
+
+// postPizzas handles POST requests to add a new pizza.
+// It binds the received JSON to a Pizza struct.
+func postPizzas(c *gin.Context) {
+	var newPizza models.Pizza
+
+	if err := c.ShouldBindJSON(&newPizza); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	// Add new pizza to the in-memory list
+	pizzas = append(pizzas, newPizza)
+	c.JSON(http.StatusCreated, newPizza)
 }
