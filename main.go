@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"pizzaria/models"
 
@@ -23,6 +25,7 @@ func main() {
 	// Register routes
 	router.GET("/pizzas", getPizzas)
 	router.POST("/pizzas", postPizzas)
+	router.GET("/pizzas/:id", getPizzasByID)
 
 	// Start server on default port :8080
 	router.Run()
@@ -32,10 +35,10 @@ func main() {
 	instagram := "pizzariago"
 	phone := "1234-5678"
 
-	println("Name:", name)
-	println("Pizzeria Info:")
-	println("Instagram:", instagram)
-	println("Phone:", phone)
+	fmt.Println("Name:", name)
+	fmt.Println("Pizzeria Info:")
+	fmt.Println("Instagram:", instagram)
+	fmt.Println("Phone:", phone)
 }
 
 // getPizzas handles GET requests and returns a list of pizzas in JSON format.
@@ -60,4 +63,24 @@ func postPizzas(c *gin.Context) {
 	// Add new pizza to the in-memory list
 	pizzas = append(pizzas, newPizza)
 	c.JSON(http.StatusCreated, newPizza)
+}
+
+// getPizzasByID handles GET requests to retrieve a pizza by its ID.
+func getPizzasByID(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+
+	for _, p := range pizzas {
+		if p.ID == id {
+			c.JSON(http.StatusOK, p)
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "pizza not found"})
 }
