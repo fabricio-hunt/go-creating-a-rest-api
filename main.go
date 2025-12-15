@@ -1,24 +1,25 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
-
+	"os"
 	"pizzaria/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 // pizzas stores an in-memory list of pizza items.
 // In real applications, this would be replaced by a database.
-var pizzas = []models.Pizza{
-	{ID: 1, Name: "Toscana", Price: 25.00},
-	{ID: 2, Name: "Margherita", Price: 20.00},
-	{ID: 3, Name: "Pepperoni", Price: 30.00},
-}
+var pizzas []models.Pizza
 
 func main() {
+
+	// Pre-load some pizza data
+	loadPizzas()
+
 	// Initialize Gin router
 	router := gin.Default()
 
@@ -60,6 +61,9 @@ func postPizzas(c *gin.Context) {
 		return
 	}
 
+	newPizza.ID = len(pizzas) + 1 // Simple ID assignment
+	savePizzas()                  // Save updated pizzas to file
+
 	// Add new pizza to the in-memory list
 	pizzas = append(pizzas, newPizza)
 	c.JSON(http.StatusCreated, newPizza)
@@ -83,4 +87,32 @@ func getPizzasByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNotFound, gin.H{"error": "pizza not found"})
+}
+
+func loadPizzas() {
+	file, err := os.Open("dados/pizzas.json")
+	if err != nil {
+		fmt.Println("Error opening pizzas.json:", err)
+		return
+	}
+
+	defer file.Close()
+	decoder := json.NewDecoder(file)
+	if err := decoder.Decode(&pizzas); err != nil {
+		fmt.Println("Error decoding pizzas.json:", err)
+	}
+}
+
+func savePizzas() {
+	file, err := os.Create("dados/pizzas.json")
+	if err != nil {
+		fmt.Println("Error creating pizzas.json:", err)
+		return
+	}
+
+	defer file.Close()
+	encoder := json.NewEncoder(file)
+	if err := encoder.Encode(pizzas); err != nil {
+		fmt.Println("Error encoding pizzas.json:", err)
+	}
 }
